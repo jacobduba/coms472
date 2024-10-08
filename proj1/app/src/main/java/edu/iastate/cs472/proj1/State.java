@@ -1,7 +1,9 @@
 package edu.iastate.cs472.proj1;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
+import java.util.Scanner;
 
 /**
  * @author
@@ -25,6 +27,7 @@ import java.util.HashSet;
 
 public class State implements Cloneable, Comparable<State> {
 	public static Heuristic heu; // heuristic used. shared by all the states.
+	final int BOARD_WIDTH = 3;
 	public int[][] board;        // configuration of tiles
 	public State previous;        // previous node on the OPEN/CLOSED list
 	public State next;            // next node on the OPEN/CLOSED list
@@ -38,12 +41,11 @@ public class State implements Cloneable, Comparable<State> {
 	// number of mismatched tiles between this state
 	// and the goal state; negative if not computed yet.
 	private int ManhattanDistance = -1;
+	// number of single and double moves with each double
+	// move counted as one; negative if not computed yet.
 	// Manhattan distance between this state and the
 	// goal state; negative if not computed yet.
 	private int numSingleDoubleMoves = -1;
-	// number of single and double moves with each double
-	// move counted as one; negative if not computed yet.
-
 
 	/**
 	 * Constructor (for the initial state).
@@ -59,10 +61,10 @@ public class State implements Cloneable, Comparable<State> {
 	 *                                  not respectively the digits 0, 1, ..., 8.
 	 */
 	public State(int[][] board) throws IllegalArgumentException {
-		final int BOARD_SIZE = 3;
 
-		if (board.length != BOARD_SIZE || board[0].length != BOARD_SIZE ||
-				board[1].length != BOARD_SIZE || board[2].length != BOARD_SIZE)
+		if (board.length != BOARD_WIDTH || board[0].length != BOARD_WIDTH ||
+				board[1].length != BOARD_WIDTH || board[2].length !=
+				BOARD_WIDTH)
 			throw new IllegalArgumentException();
 
 		HashSet<Integer> digitsNotUsed = new HashSet<>();
@@ -71,10 +73,10 @@ public class State implements Cloneable, Comparable<State> {
 			digitsNotUsed.add(i);
 		}
 
-		this.board = new int[BOARD_SIZE][BOARD_SIZE];
+		this.board = new int[BOARD_WIDTH][BOARD_WIDTH];
 
-		for (int i = 0; i < BOARD_SIZE; i++) {
-			for (int j = 0; j < BOARD_SIZE; j++) {
+		for (int i = 0; i < BOARD_WIDTH; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
 				digitsNotUsed.remove(board[i][j]);
 				this.board[i][j] = board[i][j];
 			}
@@ -100,8 +102,24 @@ public class State implements Cloneable, Comparable<State> {
 	 */
 	public State(String inputFileName)
 			throws FileNotFoundException, IllegalArgumentException {
+		// TODO handle invalid files???
+		board = new int[BOARD_WIDTH][BOARD_WIDTH];
 
-		// TODO
+		HashSet<Integer> digitsNotUsed = new HashSet<>();
+
+		for (int i = 0; i < 9; i++) {
+			digitsNotUsed.add(i);
+		}
+
+		Scanner scan = new Scanner(new File(inputFileName));
+		for (int i = 0; scan.hasNext(); i++) {
+			board[i / BOARD_WIDTH][i % BOARD_WIDTH] =
+					Integer.parseInt(scan.next());
+			digitsNotUsed.remove(board[i / BOARD_WIDTH][i % BOARD_WIDTH]);
+		}
+
+		if (!digitsNotUsed.isEmpty())
+			throw new IllegalArgumentException();
 	}
 
 
@@ -142,8 +160,20 @@ public class State implements Cloneable, Comparable<State> {
 	 * @return true if the puzzle starting in this state can be rearranged into the goal state.
 	 */
 	public boolean solvable() {
-		// TODO
-		return false;
+		final int NUM_TILES = BOARD_WIDTH * BOARD_WIDTH;
+
+		int inversions = 0;
+
+		for (int i = NUM_TILES - 1; i > -1; i--) {
+			int cur = board[i / BOARD_WIDTH][i % BOARD_WIDTH];
+			for (int j = i + 1; j < NUM_TILES; j++) {
+				if (cur > board[j / BOARD_WIDTH][j % BOARD_WIDTH]) {
+					inversions++;
+				}
+			}
+		}
+
+		return inversions % 2 == 1;
 	}
 
 
@@ -158,9 +188,24 @@ public class State implements Cloneable, Comparable<State> {
 	 */
 	public boolean isGoalState() {
 		// TODO
-		return false;
+		return board[0][0] == 1
+				&& board[0][1] == 2
+				&& board[0][2] == 3
+				&& board[1][0] == 8
+				&& board[1][1] == 0
+				&& board[1][2] == 4
+				&& board[2][0] == 7
+				&& board[2][1] == 6
+				&& board[2][2] == 5;
 	}
 
+
+	private String fmtToS(int s) {
+		if (s == 0)
+			return " ";
+
+		return Integer.toString(s);
+	}
 
 	/**
 	 * Write the board configuration according to the following format:
@@ -177,8 +222,15 @@ public class State implements Cloneable, Comparable<State> {
 	 */
 	@Override
 	public String toString() {
-		// TODO
-		return null;
+		return fmtToS(board[0][0]) + " "
+				+ fmtToS(board[0][1]) + " "
+				+ fmtToS(board[0][2]) + "\n"
+				+ fmtToS(board[1][0]) + " "
+				+ fmtToS(board[1][1]) + " "
+				+ fmtToS(board[1][2]) + "\n"
+				+ fmtToS(board[2][0]) + " "
+				+ fmtToS(board[2][1]) + " "
+				+ fmtToS(board[2][2]);
 	}
 
 
@@ -190,8 +242,15 @@ public class State implements Cloneable, Comparable<State> {
 	 */
 	@Override
 	public Object clone() {
-		// TODO
-		return null;
+		int[][] boardClone = new int[BOARD_WIDTH][BOARD_WIDTH];
+
+		for (int i = 0; i < BOARD_WIDTH; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				boardClone[i][j] = board[i][j];
+			}
+		}
+
+		return new State(boardClone);
 	}
 
 
@@ -201,8 +260,17 @@ public class State implements Cloneable, Comparable<State> {
 	 */
 	@Override
 	public boolean equals(Object o) {
-		// TODO
-		return false;
+		if (!(o instanceof State))
+			return false;
+
+		for (int i = 0; i < BOARD_WIDTH; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				if (board[i][j] != ((State) o).board[i][j])
+					return false;
+			}
+		}
+
+		return true;
 	}
 
 
