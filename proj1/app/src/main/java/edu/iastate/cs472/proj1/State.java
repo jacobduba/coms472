@@ -147,7 +147,66 @@ public class State implements Cloneable, Comparable<State> {
 	 */
 	public State successorState(Move m) throws IllegalArgumentException {
 		// TODO
-		return null;
+		int row = -1, col = -1;
+
+		for (int i = 0; i < BOARD_WIDTH; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				if (board[i][j] == 0) {
+					row = i;
+					col = j;
+				}
+			}
+		}
+
+		if ((col == 2 && m == Move.LEFT)
+				|| (col == 0 && m == Move.RIGHT)
+				|| (row == 2 && m == Move.UP)
+				|| (row == 0 && m == Move.DOWN)
+				|| (col != 0 && m == Move.DBL_LEFT)
+				|| (col != 2 && m == Move.DBL_RIGHT)
+				|| (row != 0 && m == Move.DBL_UP)
+				|| (row != 2 && m == Move.DBL_DOWN)) {
+			throw new IllegalArgumentException();
+		}
+
+		// successor
+		State s = (State) this.clone();
+
+		if (m == Move.LEFT) {
+			s.board[row][col] = s.board[row][col + 1];
+			s.board[row][col + 1] = 0;
+		} else if (m == Move.RIGHT) {
+			s.board[row][col] = s.board[row][col - 1];
+			s.board[row][col - 1] = 0;
+		} else if (m == Move.UP) {
+			s.board[row][col] = s.board[row + 1][col];
+			s.board[row + 1][col] = 0;
+		} else if (m == Move.DOWN) {
+			s.board[row][col] = s.board[row - 1][col];
+			s.board[row - 1][col] = 0;
+		} else if (m == Move.DBL_LEFT) {
+			s.board[row][0] = s.board[row][1];
+			s.board[row][1] = s.board[row][2];
+			s.board[row][2] = 0;
+		} else if (m == Move.DBL_RIGHT) {
+			s.board[row][2] = s.board[row][1];
+			s.board[row][1] = s.board[row][0];
+			s.board[row][0] = 0;
+		} else if (m == Move.DBL_UP) {
+			s.board[0][col] = s.board[1][col];
+			s.board[1][col] = s.board[2][col];
+			s.board[2][col] = 0;
+		} else if (m == Move.DBL_DOWN) {
+			s.board[2][col] = s.board[1][col];
+			s.board[1][col] = s.board[0][col];
+			s.board[0][col] = 0;
+		}
+
+		s.move = m;
+		s.predecessor = this;
+		s.numMoves = numMoves + 1;
+
+		return s;
 	}
 
 
@@ -187,7 +246,6 @@ public class State implements Cloneable, Comparable<State> {
 	 * @return
 	 */
 	public boolean isGoalState() {
-		// TODO
 		return board[0][0] == 1
 				&& board[0][1] == 2
 				&& board[0][2] == 3
