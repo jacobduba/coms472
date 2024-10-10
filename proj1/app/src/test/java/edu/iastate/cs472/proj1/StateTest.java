@@ -246,4 +246,34 @@ public class StateTest {
 		State s = new State(board);
 		s.successorState(Move.DBL_DOWN);
 	}
+
+	@Test
+	public void numMismatchedTilesTest() {
+		State.heu = Heuristic.TileMismatch;
+
+		int[][] board1 = {{1, 2, 3}, {8, 0, 4}, {7, 6, 5}};
+		State s1 = new State(board1);
+		assertEquals(0, s1.cost());
+
+		int[][] board2 = {{7, 2, 4}, {5, 0, 6}, {8, 3, 1}};
+		State s2 = new State(board2);
+		assertEquals(7, s2.cost());
+	}
+
+	@Test
+	public void manhattenDistanceTest() {
+		State.heu = Heuristic.ManhattanDist;
+
+		int[][] board1 = {{1, 2, 3}, {8, 0, 4}, {7, 6, 5}};
+		State s1 = new State(board1);
+		assertEquals(0, s1.cost());
+
+		int[][] board2 = {{7, 2, 4}, {5, 0, 6}, {8, 3, 1}};
+		State s2 = new State(board2);
+		assertEquals(16, s2.cost());
+
+		int[][] board3 = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
+		State s3 = new State(board3);
+		assertEquals(12, s3.cost());
+	}
 }

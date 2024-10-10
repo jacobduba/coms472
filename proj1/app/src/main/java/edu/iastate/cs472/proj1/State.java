@@ -345,8 +345,13 @@ public class State implements Cloneable, Comparable<State> {
 	 * @throws IllegalArgumentException if heuristic is none of TileMismatch, MahattanDist, DoubleMoveHeuristic.
 	 */
 	public int cost() throws IllegalArgumentException {
-		// TODO
-		return 0;
+		if (heu == Heuristic.TileMismatch) {
+			return numMoves + computeNumMismatchedTiles();
+		} else if (heu == Heuristic.ManhattanDist) {
+			return numMoves + computeManhattanDistance();
+		}
+
+		return numMoves + computeNumSingleDoubleMoves();
 	}
 
 
@@ -361,8 +366,10 @@ public class State implements Cloneable, Comparable<State> {
 	 */
 	@Override
 	public int compareTo(State s) {
-		// TODO
-		return 0;
+		if (this.cost() < s.cost()) return -1;
+		if (this.cost() == s.cost()) return 0;
+		// this.cost() > s.cost()
+		return -1;
 	}
 
 
@@ -373,8 +380,22 @@ public class State implements Cloneable, Comparable<State> {
 	 * @return the number of mismatched tiles between this state and the goal state.
 	 */
 	private int computeNumMismatchedTiles() {
-		// TODO 
-		return 0;
+		if (this.numMismatchedTiles > -1) {
+			return this.numMismatchedTiles;
+		}
+
+		numMismatchedTiles = 0;
+
+		if (board[0][0] != 1) numMismatchedTiles++;
+		if (board[0][1] != 2) numMismatchedTiles++;
+		if (board[0][2] != 3) numMismatchedTiles++;
+		if (board[1][2] != 4) numMismatchedTiles++;
+		if (board[2][2] != 5) numMismatchedTiles++;
+		if (board[2][1] != 6) numMismatchedTiles++;
+		if (board[2][0] != 7) numMismatchedTiles++;
+		if (board[1][0] != 8) numMismatchedTiles++;
+
+		return numMismatchedTiles;
 	}
 
 
@@ -385,8 +406,37 @@ public class State implements Cloneable, Comparable<State> {
 	 * @return the Manhattan distance between this state and the goal state.
 	 */
 	private int computeManhattanDistance() {
-		// TODO 
-		return 0;
+		if (ManhattanDistance > -1) {
+			return ManhattanDistance;
+		}
+
+		ManhattanDistance = 0;
+
+		for (int i = 0; i < BOARD_WIDTH; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				int block = board[i][j];
+
+				if (block == 1) {
+					ManhattanDistance += Math.abs(i - 0) + Math.abs(j - 0);
+				} else if (block == 2) {
+					ManhattanDistance += Math.abs(i - 0) + Math.abs(j - 1);
+				} else if (block == 3) {
+					ManhattanDistance += Math.abs(i - 0) + Math.abs(j - 2);
+				} else if (block == 4) {
+					ManhattanDistance += Math.abs(i - 1) + Math.abs(j - 2);
+				} else if (block == 5) {
+					ManhattanDistance += Math.abs(i - 2) + Math.abs(j - 2);
+				} else if (block == 6) {
+					ManhattanDistance += Math.abs(i - 2) + Math.abs(j - 1);
+				} else if (block == 7) {
+					ManhattanDistance += Math.abs(i - 2) + Math.abs(j - 0);
+				} else if (block == 8) {
+					ManhattanDistance += Math.abs(i - 1) + Math.abs(j - 0);
+				}
+			}
+		}
+
+		return ManhattanDistance;
 	}
 
 
