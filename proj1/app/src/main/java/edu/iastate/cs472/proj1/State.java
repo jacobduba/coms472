@@ -26,8 +26,9 @@ import java.util.Scanner;
  */
 
 public class State implements Cloneable, Comparable<State> {
+	public static final int BOARD_WIDTH = 3;
+	public static final int NUM_TILES = BOARD_WIDTH * BOARD_WIDTH;
 	public static Heuristic heu; // heuristic used. shared by all the states.
-	final int BOARD_WIDTH = 3;
 	public int[][] board;        // configuration of tiles
 	public State previous;        // previous node on the OPEN/CLOSED list
 	public State next;            // next node on the OPEN/CLOSED list
@@ -219,8 +220,6 @@ public class State implements Cloneable, Comparable<State> {
 	 * @return true if the puzzle starting in this state can be rearranged into the goal state.
 	 */
 	public boolean solvable() {
-		final int NUM_TILES = BOARD_WIDTH * BOARD_WIDTH;
-
 		int inversions = 0;
 
 		for (int i = NUM_TILES - 1; i > -1; i--) {
