@@ -436,39 +436,7 @@ public class State implements Cloneable, Comparable<State> {
 			return numSingleDoubleMoves;
 		}
 
-		numSingleDoubleMoves = 0;
-
-		for (int i = 0; i < BOARD_WIDTH; i++) {
-			for (int j = 0; j < BOARD_WIDTH; j++) {
-				int tile = board[i][j];
-
-				if (tile == 1) {
-					if (i != 0) numSingleDoubleMoves++;
-					if (j != 0) numSingleDoubleMoves++;
-				} else if (tile == 2) {
-					if (i != 0) numSingleDoubleMoves++;
-					if (j != 1) numSingleDoubleMoves++;
-				} else if (tile == 3) {
-					if (i != 0) numSingleDoubleMoves++;
-					if (j != 2) numSingleDoubleMoves++;
-				} else if (tile == 4) {
-					if (i != 1) numSingleDoubleMoves++;
-					if (j != 2) numSingleDoubleMoves++;
-				} else if (tile == 5) {
-					if (i != 2) numSingleDoubleMoves++;
-					if (j != 2) numSingleDoubleMoves++;
-				} else if (tile == 6) {
-					if (i != 2) numSingleDoubleMoves++;
-					if (j != 1) numSingleDoubleMoves++;
-				} else if (tile == 7) {
-					if (i != 2) numSingleDoubleMoves++;
-					if (j != 0) numSingleDoubleMoves++;
-				} else if (tile == 8) {
-					if (i != 1) numSingleDoubleMoves++;
-					if (j != 0) numSingleDoubleMoves++;
-				}
-			}
-		}
+		numSingleDoubleMoves = (computeManhattanDistance() + 1) / 2;
 
 		return numSingleDoubleMoves;
 	}
