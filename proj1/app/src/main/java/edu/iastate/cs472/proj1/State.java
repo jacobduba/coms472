@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 
 /**
- * @author
+ * @author Jacob Duba
  */
 
 

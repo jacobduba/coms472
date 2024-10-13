@@ -2,7 +2,7 @@ package edu.iastate.cs472.proj1;
 
 /**
  *  
- * @author
+ * @author Jacob Duba
  *
  */
 
