@@ -66,7 +66,7 @@ public class OrderedStateList {
 			t = t.next;
 		}
 
-		if (t != head && compareStates(s, t) == 0) return;
+		if (t != head && s.equals(t)) return;
 
 		s.previous = t.previous;
 		s.next = t;
@@ -91,7 +91,7 @@ public class OrderedStateList {
 		State t = head.next;
 
 		while (t != head) {
-			if (compareStates(s, t) == 0) return t;
+			if (s.equals(t)) return t;
 			t = t.next;
 		}
 
@@ -131,6 +131,8 @@ public class OrderedStateList {
 
 		t.previous.next = t.next;
 		t.next.previous = t.previous;
+
+		size--;
 
 		return t;
 	}
