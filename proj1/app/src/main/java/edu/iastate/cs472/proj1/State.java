@@ -368,7 +368,7 @@ public class State implements Cloneable, Comparable<State> {
 		if (this.cost() < s.cost()) return -1;
 		if (this.cost() == s.cost()) return 0;
 		// this.cost() > s.cost()
-		return -1;
+		return 1;
 	}
 
 
