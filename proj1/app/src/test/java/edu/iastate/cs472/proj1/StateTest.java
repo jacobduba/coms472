@@ -93,7 +93,7 @@ public class StateTest {
 
 	@Test
 	public void testIsSolvableUsingLectureExample() {
-		int[][] board = {{4, 1, 2}, {5, 3, 0}, {8, 6, 7}};
+		int[][] board = {{4, 1, 2}, {3, 5, 0}, {8, 6, 7}};
 		State s = new State(board);
 		assertTrue(s.solvable());
 	}
@@ -110,6 +110,13 @@ public class StateTest {
 		int[][] board = {{1, 2, 3}, {4, 0, 5}, {6, 7, 8}};
 		State s = new State(board);
 		assertFalse(s.solvable());
+	}
+
+	@Test
+	public void testIsSolvableUsingPdfExample() {
+		int[][] board = {{8, 1, 2}, {6, 3, 0}, {7, 5, 4}};
+		State s = new State(board);
+		assertTrue(s.solvable());
 	}
 
 	@Test
@@ -275,5 +282,22 @@ public class StateTest {
 		int[][] board3 = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
 		State s3 = new State(board3);
 		assertEquals(12, s3.cost());
+	}
+
+	@Test
+	public void numSingleDoubleMovesTest() {
+		State.heu = Heuristic.DoubleMoveHeuristic;
+
+		int[][] board1 = {{1, 2, 3}, {8, 0, 4}, {7, 6, 5}};
+		State s1 = new State(board1);
+		assertEquals(0, s1.cost());
+
+		int[][] board2 = {{7, 2, 4}, {5, 0, 6}, {8, 3, 1}};
+		State s2 = new State(board2);
+		assertEquals(11, s2.cost());
+
+		int[][] board3 = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
+		State s3 = new State(board3);
+		assertEquals(10, s3.cost());
 	}
 }

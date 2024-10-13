@@ -64,8 +64,8 @@ public class State implements Cloneable, Comparable<State> {
 	public State(int[][] board) throws IllegalArgumentException {
 
 		if (board.length != BOARD_WIDTH || board[0].length != BOARD_WIDTH ||
-				board[1].length != BOARD_WIDTH || board[2].length !=
-				BOARD_WIDTH)
+				board[1].length != BOARD_WIDTH ||
+				board[2].length != BOARD_WIDTH)
 			throw new IllegalArgumentException();
 
 		HashSet<Integer> digitsNotUsed = new HashSet<>();
@@ -83,8 +83,7 @@ public class State implements Cloneable, Comparable<State> {
 			}
 		}
 
-		if (!digitsNotUsed.isEmpty())
-			throw new IllegalArgumentException();
+		if (!digitsNotUsed.isEmpty()) throw new IllegalArgumentException();
 	}
 
 
@@ -119,8 +118,7 @@ public class State implements Cloneable, Comparable<State> {
 			digitsNotUsed.remove(board[i / BOARD_WIDTH][i % BOARD_WIDTH]);
 		}
 
-		if (!digitsNotUsed.isEmpty())
-			throw new IllegalArgumentException();
+		if (!digitsNotUsed.isEmpty()) throw new IllegalArgumentException();
 	}
 
 
@@ -159,14 +157,12 @@ public class State implements Cloneable, Comparable<State> {
 			}
 		}
 
-		if ((col == 2 && m == Move.LEFT)
-				|| (col == 0 && m == Move.RIGHT)
-				|| (row == 2 && m == Move.UP)
-				|| (row == 0 && m == Move.DOWN)
-				|| (col != 0 && m == Move.DBL_LEFT)
-				|| (col != 2 && m == Move.DBL_RIGHT)
-				|| (row != 0 && m == Move.DBL_UP)
-				|| (row != 2 && m == Move.DBL_DOWN)) {
+		if ((col == 2 && m == Move.LEFT) || (col == 0 && m == Move.RIGHT) ||
+				(row == 2 && m == Move.UP) || (row == 0 && m == Move.DOWN) ||
+				(col != 0 && m == Move.DBL_LEFT) ||
+				(col != 2 && m == Move.DBL_RIGHT) ||
+				(row != 0 && m == Move.DBL_UP) ||
+				(row != 2 && m == Move.DBL_DOWN)) {
 			throw new IllegalArgumentException();
 		}
 
@@ -225,7 +221,9 @@ public class State implements Cloneable, Comparable<State> {
 		for (int i = NUM_TILES - 1; i > -1; i--) {
 			int cur = board[i / BOARD_WIDTH][i % BOARD_WIDTH];
 			for (int j = i + 1; j < NUM_TILES; j++) {
-				if (cur > board[j / BOARD_WIDTH][j % BOARD_WIDTH]) {
+				if (cur == 0) break;
+				if (board[j / BOARD_WIDTH][j % BOARD_WIDTH] != 0 &&
+						cur > board[j / BOARD_WIDTH][j % BOARD_WIDTH]) {
 					inversions++;
 				}
 			}
@@ -245,21 +243,14 @@ public class State implements Cloneable, Comparable<State> {
 	 * @return
 	 */
 	public boolean isGoalState() {
-		return board[0][0] == 1
-				&& board[0][1] == 2
-				&& board[0][2] == 3
-				&& board[1][0] == 8
-				&& board[1][1] == 0
-				&& board[1][2] == 4
-				&& board[2][0] == 7
-				&& board[2][1] == 6
-				&& board[2][2] == 5;
+		return board[0][0] == 1 && board[0][1] == 2 && board[0][2] == 3 &&
+				board[1][0] == 8 && board[1][1] == 0 && board[1][2] == 4 &&
+				board[2][0] == 7 && board[2][1] == 6 && board[2][2] == 5;
 	}
 
 
 	private String fmtToS(int s) {
-		if (s == 0)
-			return " ";
+		if (s == 0) return " ";
 
 		return Integer.toString(s);
 	}
@@ -279,15 +270,11 @@ public class State implements Cloneable, Comparable<State> {
 	 */
 	@Override
 	public String toString() {
-		return fmtToS(board[0][0]) + " "
-				+ fmtToS(board[0][1]) + " "
-				+ fmtToS(board[0][2]) + "\n"
-				+ fmtToS(board[1][0]) + " "
-				+ fmtToS(board[1][1]) + " "
-				+ fmtToS(board[1][2]) + "\n"
-				+ fmtToS(board[2][0]) + " "
-				+ fmtToS(board[2][1]) + " "
-				+ fmtToS(board[2][2]);
+		return fmtToS(board[0][0]) + " " + fmtToS(board[0][1]) + " " +
+				fmtToS(board[0][2]) + "\n" + fmtToS(board[1][0]) + " " +
+				fmtToS(board[1][1]) + " " + fmtToS(board[1][2]) + "\n" +
+				fmtToS(board[2][0]) + " " + fmtToS(board[2][1]) + " " +
+				fmtToS(board[2][2]);
 	}
 
 
@@ -317,13 +304,11 @@ public class State implements Cloneable, Comparable<State> {
 	 */
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof State))
-			return false;
+		if (!(o instanceof State)) return false;
 
 		for (int i = 0; i < BOARD_WIDTH; i++) {
 			for (int j = 0; j < BOARD_WIDTH; j++) {
-				if (board[i][j] != ((State) o).board[i][j])
-					return false;
+				if (board[i][j] != ((State) o).board[i][j]) return false;
 			}
 		}
 
@@ -447,7 +432,44 @@ public class State implements Cloneable, Comparable<State> {
 	 * single or double, which will take this state to the goal state.
 	 */
 	private int computeNumSingleDoubleMoves() {
-		// TODO 
-		return 0;
+		if (numSingleDoubleMoves > -1) {
+			return numSingleDoubleMoves;
+		}
+
+		numSingleDoubleMoves = 0;
+
+		for (int i = 0; i < BOARD_WIDTH; i++) {
+			for (int j = 0; j < BOARD_WIDTH; j++) {
+				int block = board[i][j];
+
+				if (block == 1) {
+					if (i != 0) numSingleDoubleMoves++;
+					if (j != 0) numSingleDoubleMoves++;
+				} else if (block == 2) {
+					if (i != 0) numSingleDoubleMoves++;
+					if (j != 1) numSingleDoubleMoves++;
+				} else if (block == 3) {
+					if (i != 0) numSingleDoubleMoves++;
+					if (j != 2) numSingleDoubleMoves++;
+				} else if (block == 4) {
+					if (i != 1) numSingleDoubleMoves++;
+					if (j != 2) numSingleDoubleMoves++;
+				} else if (block == 5) {
+					if (i != 2) numSingleDoubleMoves++;
+					if (j != 2) numSingleDoubleMoves++;
+				} else if (block == 6) {
+					if (i != 2) numSingleDoubleMoves++;
+					if (j != 1) numSingleDoubleMoves++;
+				} else if (block == 7) {
+					if (i != 2) numSingleDoubleMoves++;
+					if (j != 0) numSingleDoubleMoves++;
+				} else if (block == 8) {
+					if (i != 1) numSingleDoubleMoves++;
+					if (j != 0) numSingleDoubleMoves++;
+				}
+			}
+		}
+
+		return numSingleDoubleMoves;
 	}
 }
