@@ -203,6 +203,8 @@ public class State implements Cloneable, Comparable<State> {
 		s.predecessor = this;
 		s.numMoves = numMoves + 1;
 
+		if (s.equals(this.predecessor)) return null;
+
 		return s;
 	}
 

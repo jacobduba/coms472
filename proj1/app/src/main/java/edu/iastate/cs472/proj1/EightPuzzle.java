@@ -54,7 +54,7 @@ public class EightPuzzle {
 		try {
 			State suc = first.successorState(move);
 
-			if (suc.equals(first.predecessor)) return;
+			if (suc == null) return;
 
 			State open = OPEN.findState(suc);
 			State closed = CLOSED.findState(suc);

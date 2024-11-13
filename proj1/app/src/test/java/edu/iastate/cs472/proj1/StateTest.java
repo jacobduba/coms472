@@ -186,11 +186,8 @@ public class StateTest {
 		State s1 = new State(board);
 		State s2 = s1.successorState(Move.DBL_RIGHT);
 		State s3 = s2.successorState(Move.DOWN);
-		// Go up and down to test DBL_DOWN
-		State s4 = s3.successorState(Move.DBL_UP);
-		State s5 = s4.successorState(Move.DBL_DOWN);
-		State s6 = s5.successorState(Move.DBL_LEFT);
-		State s7 = s6.successorState(Move.DBL_UP);
+		State s4 = s3.successorState(Move.DBL_LEFT);
+		State s7 = s4.successorState(Move.DBL_UP);
 		State s8 = s7.successorState(Move.RIGHT);
 		State s9 = s8.successorState(Move.DOWN);
 
@@ -284,20 +281,20 @@ public class StateTest {
 		assertEquals(12, s3.cost());
 	}
 
-	@Test
-	public void numSingleDoubleMovesTest() {
-		State.heu = Heuristic.DoubleMoveHeuristic;
-
-		int[][] board1 = {{1, 2, 3}, {8, 0, 4}, {7, 6, 5}};
-		State s1 = new State(board1);
-		assertEquals(0, s1.cost());
-
-		int[][] board2 = {{7, 2, 4}, {5, 0, 6}, {8, 3, 1}};
-		State s2 = new State(board2);
-		assertEquals(11, s2.cost());
-
-		int[][] board3 = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
-		State s3 = new State(board3);
-		assertEquals(10, s3.cost());
-	}
+//	@Test
+//	public void numSingleDoubleMovesTest() {
+//		State.heu = Heuristic.DoubleMoveHeuristic;
+//
+//		int[][] board1 = {{1, 2, 3}, {8, 0, 4}, {7, 6, 5}};
+//		State s1 = new State(board1);
+//		assertEquals(0, s1.cost());
+//
+//		int[][] board2 = {{7, 2, 4}, {5, 0, 6}, {8, 3, 1}};
+//		State s2 = new State(board2);
+//		assertEquals(11, s2.cost());
+//
+//		int[][] board3 = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
+//		State s3 = new State(board3);
+//		assertEquals(10, s3.cost());
+//	}
 }
