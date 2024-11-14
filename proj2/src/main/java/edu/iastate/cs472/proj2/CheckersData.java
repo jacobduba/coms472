@@ -16,12 +16,8 @@ public class CheckersData {
       on the board.  The constants RED and BLACK also represent players
       in the game. */
 
-	static final int
-			EMPTY = 0,
-			RED = 1,
-			RED_KING = 2,
-			BLACK = 3,
-			BLACK_KING = 4;
+	static final int EMPTY = 0, RED = 1, RED_KING = 2, BLACK = 3, BLACK_KING =
+			4;
 
 
 	int[][] board;  // board[r][c] is the contents of row r, column c.
@@ -75,23 +71,18 @@ public class CheckersData {
 	 * and all such squares in the last three rows contain red squares.
 	 */
 	void setUpGame() {
-		// TODO
-		//
 		// Set up the board with pieces BLACK, RED, and EMPTY
-		for (int row = 0; row < 3; row++) {
+		for (int row = 0; row < 8; row++) {
 			for (int col = 0; col < board[0].length; col++) {
 				if ((col % 2 == 0 && row % 2 == 0) ||
 						(col % 2 == 1 && row % 2 == 1)) {
-					board[row][col] = BLACK;
-				}
-			}
-		}
-
-		for (int row = 5; row < 8; row++) {
-			for (int col = 0; col < board[0].length; col++) {
-				if ((col % 2 == 0 && row % 2 == 0) ||
-						(col % 2 == 1 && row % 2 == 1)) {
-					board[row][col] = RED;
+					if (row < 3) {
+						board[row][col] = BLACK;
+					} else if (row > 4) {
+						board[row][col] = RED;
+					} else {
+						board[row][col] = EMPTY;
+					}
 				}
 			}
 		}
@@ -140,6 +131,36 @@ public class CheckersData {
 		// 1. move the piece from (fromRow,fromCol) to (toRow,toCol)
 		// 2. if this move is a jump, remove the captured piece
 		// 3. if the piece moves into the kings row on the opponent's side of the board, crowned it as a king
+
+		int piece = board[fromRow][fromCol];
+		board[fromRow][fromCol] = EMPTY;
+		board[toRow][toCol] = piece;
+
+		if (Math.abs(toRow - fromRow) == 2 && Math.abs(toCol - fromCol) == 2) {
+			board[fromRow + (toRow - fromRow) / 2][fromCol +
+					(toCol - fromCol) / 2] = EMPTY;
+		}
+
+		if (piece == RED && toRow == 0) {
+			board[toRow][toCol] = RED_KING;
+		} else if (piece == BLACK && toRow == 7) {
+			board[toRow][toCol] = BLACK_KING;
+		}
+	}
+
+	boolean tileIsInBounds(int row, int col) {
+		return -1 < row && row < 8 && -1 < col && col < 8;
+	}
+
+	boolean tileIsEmpty(int row, int col) {
+		return tileIsInBounds(row, col) && board[row][col] == EMPTY;
+	}
+
+	boolean tileIsOpponentOf(int row, int col, int player) {
+		return tileIsInBounds(row, col) && ((player == RED &&
+				(board[row][col] == BLACK || board[row][col] == BLACK_KING)) ||
+				(player == BLACK && (board[row][col] == RED ||
+						board[row][col] == RED_KING)));
 	}
 
 	/**
@@ -154,10 +175,90 @@ public class CheckersData {
 	 * @param player color of the player, RED or BLACK
 	 */
 	CheckersMove[] getLegalMoves(int player) {
-		// TODO
-		return new CheckersMove[0];
+		if (player != RED && player != BLACK)
+			return null;
+
+		ArrayList<CheckersMove> legalJumps = new ArrayList<CheckersMove>();
+		for (int row = 0; row < 8; row++) {
+			for (int col = 0; col < 8; col++) {
+				CheckersMove[] legalJumpsFromTile =
+						getLegalJumpsFrom(player, row, col);
+				if (legalJumpsFromTile != null)
+					legalJumps.addAll(Arrays.asList(legalJumpsFromTile));
+			}
+		}
+
+		if (!legalJumps.isEmpty())
+			return legalJumps.toArray(new CheckersMove[0]);
+
+		ArrayList<CheckersMove> legalMoves = new ArrayList<>();
+		for (int row = 0; row < 8; row++) {
+			for (int col = 0; col < 8; col++) {
+				if ((player == RED && (board[row][col] == RED ||
+						board[row][col] == RED_KING)) ||
+						(player == BLACK && board[row][col] == BLACK_KING)) {
+					if (tileIsEmpty(row - 1, col - 1))
+						legalMoves.add(new CheckersMove(row, col, row - 1,
+								col - 1));
+
+					if (tileIsEmpty(row - 1, col + 1))
+						legalMoves.add(new CheckersMove(row, col, row - 1,
+								col + 1));
+				}
+
+				if ((player == BLACK && (board[row][col] == BLACK ||
+						board[row][col] == BLACK_KING)) ||
+						(player == RED && board[row][col] == RED_KING)) {
+					if (tileIsEmpty(row + 1, col - 1))
+						legalMoves.add(new CheckersMove(row, col, row + 1,
+								col - 1));
+
+					if (tileIsEmpty(row + 1, col + 1))
+						legalMoves.add(new CheckersMove(row, col, row + 1,
+								col + 1));
+				}
+			}
+
+		}
+
+
+		return legalMoves.toArray(new CheckersMove[0]);
 	}
 
+
+	private void exploreJump(int row, int col, int rowOffset, int colOffset,
+							 int player, ArrayList<CheckersMove> moves,
+							 int[][] initialState) {
+		if (tileIsOpponentOf(row + rowOffset, col + colOffset, player) &&
+				tileIsEmpty(row + 2 * rowOffset, col + 2 * colOffset)) {
+
+			makeMove(row, col, row + 2 * rowOffset, col + 2 * colOffset);
+
+			CheckersMove[] pathMoves =
+					getLegalJumpsFrom(player, row + 2 * rowOffset,
+							col + 2 * colOffset);
+
+			if (pathMoves == null) {
+				moves.add(new CheckersMove(row, col, row + 2 * rowOffset,
+						col + 2 * colOffset));
+			} else {
+				for (CheckersMove move : pathMoves) {
+					CheckersMove combinedMove = new CheckersMove();
+					combinedMove.addMove(row, col);
+					for (int i = 0; i < move.cols.size(); i++) {
+						combinedMove.addMove(move.rows.get(i),
+								move.cols.get(i));
+					}
+					moves.add(combinedMove);
+				}
+			}
+
+			// restore initial state to backtrack moves made
+			for (int i = 0; i < 8; i++) {
+				board[i] = initialState[i].clone();
+			}
+		}
+	}
 
 	/**
 	 * Return a list of the legal jumps that the specified player can
@@ -168,14 +269,41 @@ public class CheckersData {
 	 * Note that each CheckerMove may contain multiple jumps.
 	 * Each move returned in the array represents a sequence of jumps
 	 * until no further jump is allowed.
+	 * another
 	 *
 	 * @param player The player of the current jump, either RED or BLACK.
 	 * @param row    row index of the start square.
 	 * @param col    col index of the start square.
 	 */
 	CheckersMove[] getLegalJumpsFrom(int player, int row, int col) {
-		// TODO
-		return new CheckersMove[0];
-	}
+		if ((player == RED &&
+				(board[row][col] != RED && board[row][col] != RED_KING)) ||
+				(player == BLACK && (board[row][col] != BLACK &&
+						board[row][col] != RED_KING))) {
+			return null;
+		}
 
+		ArrayList<CheckersMove> legalJumps = new ArrayList<>();
+
+		// Save initial state for backtracking
+		int[][] initialState = new int[8][];
+		for (int i = 0; i < 8; i++) {
+			initialState[i] = board[i].clone();
+		}
+
+
+		if (player == RED || board[row][col] == BLACK_KING) {
+			exploreJump(row, col, -1, -1, player, legalJumps, initialState);
+			exploreJump(row, col, -1, 1, player, legalJumps, initialState);
+		}
+
+		if (player == BLACK || board[row][col] == RED_KING) {
+			exploreJump(row, col, 1, -1, player, legalJumps, initialState);
+			exploreJump(row, col, 1, 1, player, legalJumps, initialState);
+		}
+
+		if (legalJumps.isEmpty()) return null;
+
+		return legalJumps.toArray(new CheckersMove[0]);
+	}
 }
