@@ -276,10 +276,11 @@ public class CheckersData {
 	 * @param col    col index of the start square.
 	 */
 	CheckersMove[] getLegalJumpsFrom(int player, int row, int col) {
-		if ((player == RED &&
-				(board[row][col] != RED && board[row][col] != RED_KING)) ||
-				(player == BLACK && (board[row][col] != BLACK &&
-						board[row][col] != RED_KING))) {
+		// TODO FIX
+		if ((player != RED ||
+				(board[row][col] != RED && board[row][col] != RED_KING)) &&
+				(player != BLACK || (board[row][col] != BLACK &&
+						board[row][col] != BLACK_KING))) {
 			return null;
 		}
 
