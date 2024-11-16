@@ -221,6 +221,8 @@ public class CheckersData {
 
 		}
 
+		if (legalMoves.isEmpty())
+			return null;
 
 		return legalMoves.toArray(new CheckersMove[0]);
 	}
@@ -276,7 +278,6 @@ public class CheckersData {
 	 * @param col    col index of the start square.
 	 */
 	CheckersMove[] getLegalJumpsFrom(int player, int row, int col) {
-		// TODO FIX
 		if ((player != RED ||
 				(board[row][col] != RED && board[row][col] != RED_KING)) &&
 				(player != BLACK || (board[row][col] != BLACK &&
@@ -291,7 +292,6 @@ public class CheckersData {
 		for (int i = 0; i < 8; i++) {
 			initialState[i] = board[i].clone();
 		}
-
 
 		if (player == RED || board[row][col] == BLACK_KING) {
 			exploreJump(row, col, -1, -1, player, legalJumps, initialState);
