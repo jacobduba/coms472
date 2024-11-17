@@ -24,6 +24,8 @@ import java.util.Random;
  * of type Checkers as its content pane.
  * 
  * Adapt to the changes in CheckersMove.
+ *
+ * @author Jacob Duba
  * 
  */
 public class Checkers extends JPanel {

@@ -9,6 +9,8 @@ import java.util.Arrays;
  * Note that RED moves "up" the board (i.e. row number decreases)
  * while BLACK moves "down" the board (i.e. row number increases).
  * Methods are provided to return lists of available legal moves.
+ *
+ * @author Jacob Duba
  */
 public class CheckersData {
 

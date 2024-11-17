@@ -4,23 +4,24 @@ import java.util.ArrayList;
 
 /**
  * Node type for the Monte Carlo search tree.
+ * @author Jacob Duba
  */
 public class MCNode {
 	CheckersMove move;
 	MCNode parent;
 	int wins, playouts;
-	float ucb;
 	CheckersMove[] legalMoves;
 	ArrayList<MCNode> successorNodes;
+	int player;
 
-	public MCNode(CheckersMove cm, MCNode parent, AdversarialSearch as) {
+	public MCNode(CheckersMove cm, MCNode parent, int player) {
 		this.parent = parent;
 		this.wins = 0;
 		this.playouts = 0;
-		this.ucb = -1;
-		this.legalMoves = as.legalMoves();
+		this.legalMoves = null;
 		this.successorNodes = new ArrayList<>();
 		this.move = cm;
+		this.player = player;
 	}
 
 	public boolean fullyExpanded() {
