@@ -12,7 +12,7 @@ import java.util.Random;
  * move at the current state.
  */
 public class MonteCarloTreeSearch extends AdversarialSearch {
-	final static int MAX_MOVE_COUNT = 200;
+	final static int MAX_MOVE_COUNT = 60;
 	final static double c = Math.sqrt(2);
 	final static int DRAW = 0;
 
@@ -54,7 +54,7 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 
 		int[][] initialState = board.saveState();
 
-		while (tree.size < 10000) {
+		while (tree.size < 500) {
 			MCNode leaf = select(tree.root);
 			MCNode child;
 			int simWinner;
