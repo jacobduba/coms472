@@ -14,6 +14,7 @@ import java.util.Random;
 public class MonteCarloTreeSearch extends AdversarialSearch {
 	final static int MAX_MOVE_COUNT = 200;
 	final static double c = Math.sqrt(2);
+	final static int DRAW = 0;
 
 	/**
 	 * The input parameter legalMoves contains all the possible moves.
@@ -53,11 +54,18 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 
 		int[][] initialState = board.saveState();
 
-		while (tree.size < 1000) {
+		while (tree.size < 10000) {
 			MCNode leaf = select(tree.root);
-			MCNode child = expand(leaf);
+			MCNode child;
+			int simWinner;
+			if (leaf.legalMoves == null) {
+				child = leaf;
+				simWinner = opponent(child.player);
+			} else {
+				child = expand(leaf);
+				simWinner = simulation(child);
+			}
 			tree.size++;
-			int simWinner = simulation(child);
 			backPropagate(child, simWinner);
 			board.restoreState(initialState);
 		}
@@ -72,8 +80,6 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 		return sucList.get(maxI).move;
 	}
 
-	// TODO WHAT IF A PLAYER WINS IN THE TREE
-	//
 	// Implement your helper methods here. They include at least the methods for selection,
 	// expansion, simulation, and back-propagation.
 	//
@@ -136,7 +142,7 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 		return child;
 	}
 
-	// Returns which player won game with random moves
+	// Returns which player won game with random moves or 0 for draw
 	int simulation(MCNode child) {
 		Random rand = new Random();
 
@@ -151,13 +157,36 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 
 			board.makeMove(randMove);
 
-			System.out.println(randMove.cols);
-
 			player = opponent(child.player);
 			legalMoves = board.getLegalMoves(player);
 		}
 
-//		if (moveCount == MAX_MOVE_COUNT)
+		// heuristic to determine winner (count up score)
+		if (moveCount == MAX_MOVE_COUNT) {
+			int redCount = 0, blackCount = 0;
+			for (int row = 0; row < 8; row++) {
+				for (int col = 0; col < 8; col++) {
+					if (board.board[row][col] == CheckersData.RED) {
+						redCount++;
+					} else if (board.board[row][col] == CheckersData.BLACK) {
+						blackCount++;
+					} else if (board.board[row][col] == CheckersData.RED_KING) {
+						redCount += 3;
+					} else if (board.board[row][col] ==
+							CheckersData.BLACK_KING) {
+						blackCount += 3;
+					}
+				}
+			}
+
+			if (redCount == blackCount) {
+				return DRAW;
+			} else if (redCount > blackCount) {
+				return CheckersData.RED;
+			} else {
+				return CheckersData.BLACK;
+			}
+		}
 
 		// player is the looser, so opponent is winner
 		return opponent(player);
@@ -169,7 +198,9 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 
 		node.playouts++;
 
-		if (node.player == winner)
+		if (winner == DRAW)
+			node.wins += 0.5;
+		else if (node.player == winner)
 			node.wins++;
 
 		backPropagate(node.parent, winner);

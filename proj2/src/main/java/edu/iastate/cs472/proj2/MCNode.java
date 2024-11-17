@@ -9,7 +9,8 @@ import java.util.ArrayList;
 public class MCNode {
 	CheckersMove move;
 	MCNode parent;
-	int wins, playouts;
+	double wins;
+	int playouts;
 	CheckersMove[] legalMoves;
 	ArrayList<MCNode> successorNodes;
 	int player;
@@ -25,7 +26,7 @@ public class MCNode {
 	}
 
 	public boolean fullyExpanded() {
-		return legalMoves.length == successorNodes.size();
+		return legalMoves != null && legalMoves.length == successorNodes.size();
 	}
 
 	public int firstUnexpandedNode() {
