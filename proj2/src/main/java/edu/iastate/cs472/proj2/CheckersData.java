@@ -33,9 +33,9 @@ public class CheckersData {
 		setUpGame();
 	}
 
-	public static final String ANSI_RESET = "\u001B[0m";
-	public static final String ANSI_RED = "\u001B[31m";
-	public static final String ANSI_YELLOW = "\u001B[33m";
+//	public static final String ANSI_RESET = "\u001B[0m";
+//	public static final String ANSI_RED = "\u001B[31m";
+//	public static final String ANSI_YELLOW = "\u001B[33m";
 
 	@Override
 	public String toString() {
@@ -48,13 +48,17 @@ public class CheckersData {
 				if (n == 0) {
 					sb.append(" ");
 				} else if (n == 1) {
-					sb.append(ANSI_RED + "R" + ANSI_RESET);
+//					sb.append(ANSI_RED + "R" + ANSI_RESET);
+					sb.append("R");
 				} else if (n == 2) {
-					sb.append(ANSI_RED + "K" + ANSI_RESET);
+//					sb.append(ANSI_RED + "K" + ANSI_RESET);
+					sb.append("K");
 				} else if (n == 3) {
-					sb.append(ANSI_YELLOW + "B" + ANSI_RESET);
+//					sb.append(ANSI_YELLOW + "B" + ANSI_RESET);
+					sb.append("B");
 				} else if (n == 4) {
-					sb.append(ANSI_YELLOW + "K" + ANSI_RESET);
+//					sb.append(ANSI_YELLOW + "K" + ANSI_RESET);
+					sb.append("K");
 				}
 				sb.append(" ");
 			}
