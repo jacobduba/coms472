@@ -54,7 +54,7 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 
 		int[][] initialState = board.saveState();
 
-		while (tree.size < 5000) {
+		while (tree.size < 10000) {
 			MCNode leaf = select(tree.root);
 			MCNode child;
 			int simWinner;

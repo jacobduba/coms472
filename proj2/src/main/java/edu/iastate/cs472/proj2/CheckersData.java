@@ -131,8 +131,6 @@ public class CheckersData {
 	 * @param toCol   column index of the to square
 	 */
 	void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
-		// TODO
-		//
 		// Update the board for the given move. You need to take care of the following situations:
 		// 1. move the piece from (fromRow,fromCol) to (toRow,toCol)
 		// 2. if this move is a jump, remove the captured piece
@@ -237,33 +235,42 @@ public class CheckersData {
 	private void exploreJump(int row, int col, int rowOffset, int colOffset,
 							 int player, ArrayList<CheckersMove> moves,
 							 int[][] initialState) {
-		if (tileIsOpponentOf(row + rowOffset, col + colOffset, player) &&
-				tileIsEmpty(row + 2 * rowOffset, col + 2 * colOffset)) {
+		if (!tileIsOpponentOf(row + rowOffset, col + colOffset, player) ||
+				!tileIsEmpty(row + 2 * rowOffset, col + 2 * colOffset))
+			return;
 
+		if ((board[row][col] == RED && row + 2 * rowOffset == 0) ||
+				(board[row][col] == BLACK && row + 2 * rowOffset == 8)) {
 			makeMove(row, col, row + 2 * rowOffset, col + 2 * colOffset);
-
-			CheckersMove[] pathMoves =
-					getLegalJumpsFrom(player, row + 2 * rowOffset,
-							col + 2 * colOffset);
-
-			if (pathMoves == null) {
-				moves.add(new CheckersMove(row, col, row + 2 * rowOffset,
-						col + 2 * colOffset));
-			} else {
-				for (CheckersMove move : pathMoves) {
-					CheckersMove combinedMove = new CheckersMove();
-					combinedMove.addMove(row, col);
-					for (int i = 0; i < move.cols.size(); i++) {
-						combinedMove.addMove(move.rows.get(i),
-								move.cols.get(i));
-					}
-					moves.add(combinedMove);
-				}
-			}
-
-			// restore initial state to backtrack moves made
+			moves.add(new CheckersMove(row, col, row + 2 * rowOffset,
+					col + 2 * colOffset));
 			restoreState(initialState);
+			return;
 		}
+
+		makeMove(row, col, row + 2 * rowOffset, col + 2 * colOffset);
+
+		CheckersMove[] pathMoves =
+				getLegalJumpsFrom(player, row + 2 * rowOffset,
+						col + 2 * colOffset);
+
+		if (pathMoves == null) {
+			moves.add(new CheckersMove(row, col, row + 2 * rowOffset,
+					col + 2 * colOffset));
+		} else {
+			for (CheckersMove move : pathMoves) {
+				CheckersMove combinedMove = new CheckersMove();
+				combinedMove.addMove(row, col);
+				for (int i = 0; i < move.cols.size(); i++) {
+					combinedMove.addMove(move.rows.get(i),
+							move.cols.get(i));
+				}
+				moves.add(combinedMove);
+			}
+		}
+
+		// restore initial state to backtrack moves made
+		restoreState(initialState);
 	}
 
 	/**
