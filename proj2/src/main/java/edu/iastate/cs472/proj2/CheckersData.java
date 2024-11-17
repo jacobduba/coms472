@@ -256,9 +256,7 @@ public class CheckersData {
 			}
 
 			// restore initial state to backtrack moves made
-			for (int i = 0; i < 8; i++) {
-				board[i] = initialState[i].clone();
-			}
+			restoreState(initialState);
 		}
 	}
 
@@ -288,10 +286,7 @@ public class CheckersData {
 		ArrayList<CheckersMove> legalJumps = new ArrayList<>();
 
 		// Save initial state for backtracking
-		int[][] initialState = new int[8][];
-		for (int i = 0; i < 8; i++) {
-			initialState[i] = board[i].clone();
-		}
+		int[][] initialState = saveState();
 
 		if (player == RED || board[row][col] == BLACK_KING) {
 			exploreJump(row, col, -1, -1, player, legalJumps, initialState);
@@ -306,5 +301,24 @@ public class CheckersData {
 		if (legalJumps.isEmpty()) return null;
 
 		return legalJumps.toArray(new CheckersMove[0]);
+	}
+
+	int[][] saveState() {
+		int[][] state = new int[8][8];
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				state[i][j] = board[i][j];
+			}
+		}
+
+		return state;
+	}
+
+	void restoreState(int[][] state) {
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				board[i][j] = state[i][j];
+			}
+		}
 	}
 }

@@ -5,11 +5,9 @@ package edu.iastate.cs472.proj2;
  * you may get the work done using the MCNode class. 
  * 
  * @author 
- *
- * @param <E>
  */
-public class MCTree<E> 
+public class MCTree
 {
-	MCNode<E> root;
+	MCNode root;
 	int size;
 }

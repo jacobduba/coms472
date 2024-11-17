@@ -24,8 +24,7 @@ public abstract class AdversarialSearch {
      * @return an array of valid moves
      */
     protected CheckersMove[] legalMoves() {
-    	// TODO
-    	return null; 
+    	return board.getLegalMoves(CheckersData.BLACK);
     }
 	
     /**
