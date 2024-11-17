@@ -12,12 +12,9 @@ import java.util.Random;
  * move at the current state.
  */
 public class MonteCarloTreeSearch extends AdversarialSearch {
-	final static int MAX_MOVE_COUNT = 100;
+	final static int MAX_MOVE_COUNT = 200;
 	final static double c = Math.sqrt(2);
 	final static int DRAW = 0;
-	final static double CENTER_SQUARE_BONUS = 0.3;
-	final static double BACK_ROW_BONUS = 0.2;
-	final static double PROTECTED_PIECE_BONUS = 0.25;
 
 	/**
 	 * The input parameter legalMoves contains all the possible moves.
@@ -166,11 +163,25 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 
 		// heuristic to determine winner (count up score)
 		if (moveCount == MAX_MOVE_COUNT) {
-			double score = evaluatePosition();
+			int redCount = 0, blackCount = 0;
+			for (int row = 0; row < 8; row++) {
+				for (int col = 0; col < 8; col++) {
+					if (board.board[row][col] == CheckersData.RED) {
+						redCount++;
+					} else if (board.board[row][col] == CheckersData.BLACK) {
+						blackCount++;
+					} else if (board.board[row][col] == CheckersData.RED_KING) {
+						redCount += 3;
+					} else if (board.board[row][col] ==
+							CheckersData.BLACK_KING) {
+						blackCount += 3;
+					}
+				}
+			}
 
-			if (score == 0) {
+			if (redCount == blackCount) {
 				return DRAW;
-			} else if (score > 0) {
+			} else if (redCount > blackCount) {
 				return CheckersData.RED;
 			} else {
 				return CheckersData.BLACK;
@@ -193,111 +204,5 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 			node.wins++;
 
 		backPropagate(node.parent, winner);
-	}
-
-	private double evaluatePosition() {
-		double redScore = 0, blackScore = 0;
-
-		// Count material and position
-		for (int row = 0; row < 8; row++) {
-			for (int col = 0; col < 8; col++) {
-				int piece = board.pieceAt(row, col);
-				switch (piece) {
-					case CheckersData.RED:
-						redScore += 10;
-						// Bonus for advancement
-						redScore += (7 - row) * 0.5;
-						// Center control bonus
-						if ((row == 3 || row == 4) && (col == 3 || col == 4)) {
-							redScore += CENTER_SQUARE_BONUS;
-						}
-						// Back row bonus
-						if (row == 7) {
-							redScore += BACK_ROW_BONUS;
-						}
-						// Protected piece bonus
-						if (isProtected(row, col, CheckersData.RED)) {
-							redScore += PROTECTED_PIECE_BONUS;
-						}
-						break;
-
-					case CheckersData.RED_KING:
-						redScore += 30;
-						if (isProtected(row, col, CheckersData.RED)) {
-							redScore += PROTECTED_PIECE_BONUS;
-						}
-						break;
-
-					case CheckersData.BLACK:
-						blackScore += 10;
-						// Bonus for advancement
-						blackScore += row * 0.5;
-						// Center control
-						if ((row == 3 || row == 4) && (col == 3 || col == 4)) {
-							blackScore += CENTER_SQUARE_BONUS;
-						}
-						// Back row bonus
-						if (row == 0) {
-							blackScore += BACK_ROW_BONUS;
-						}
-						// Protected piece bonus
-						if (isProtected(row, col, CheckersData.BLACK)) {
-							blackScore += PROTECTED_PIECE_BONUS;
-						}
-						break;
-
-					case CheckersData.BLACK_KING:
-						blackScore += 30;
-						if (isProtected(row, col, CheckersData.BLACK)) {
-							blackScore += PROTECTED_PIECE_BONUS;
-						}
-						break;
-				}
-			}
-		}
-
-		// Factor in mobility
-		redScore += getMobilityScore(CheckersData.RED) * 0.2;
-		blackScore += getMobilityScore(CheckersData.BLACK) * 0.2;
-
-		return redScore - blackScore;
-	}
-
-	private boolean isProtected(int row, int col, int player) {
-		// Check if piece is protected by friendly pieces
-		int[][] directions = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
-		int protectedCount = 0;
-
-		for (int[] dir : directions) {
-			int newRow = row + dir[0];
-			int newCol = col + dir[1];
-			if (board.tileIsInBounds(newRow, newCol)) {
-				int piece = board.pieceAt(newRow, newCol);
-				if (player == CheckersData.RED &&
-						(piece == CheckersData.RED || piece == CheckersData.RED_KING)) {
-					protectedCount++;
-				} else if (player == CheckersData.BLACK &&
-						(piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING)) {
-					protectedCount++;
-				}
-			}
-		}
-
-		return protectedCount > 0;
-	}
-
-	private int getMobilityScore(int player) {
-		CheckersMove[] moves = board.getLegalMoves(player);
-		if (moves == null) return 0;
-
-		int mobilityScore = 0;
-		for (CheckersMove move : moves) {
-			if (move.isJump()) {
-				mobilityScore += 3;  // Jumps worth more
-			} else {
-				mobilityScore += 1;
-			}
-		}
-		return mobilityScore;
 	}
 }
