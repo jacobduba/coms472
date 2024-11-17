@@ -43,24 +43,35 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 
 		MCNode rootNode = new MCNode(null, null, CheckersData.RED);
 		rootNode.legalMoves = board.getLegalMoves(CheckersData.BLACK);
+
+		if (rootNode.legalMoves == null)
+			return null;
+
 		tree.root = rootNode;
 		tree.size = 1;
 
 		int[][] initialState = board.saveState();
 
 		while (tree.size < 1000) {
+			MCNode leaf = select(tree.root);
+			MCNode child = expand(leaf);
 			tree.size++;
+			int simWinner = simulation(child);
+			backPropagate(child, simWinner);
+			board.restoreState(initialState);
 		}
-		// TODO
 
-		board.restoreState(initialState);
+		ArrayList<MCNode> sucList = tree.root.successorNodes;
+		int maxI = 0;
+		for (int i = 0; i < tree.root.successorNodes.size(); i++) {
+			if (sucList.get(i).playouts > sucList.get(maxI).playouts)
+				maxI = i;
+		}
 
-		// Return the move for the current state.
-		// Here, we simply return the first legal move for demonstration.
-		return legalMoves[0];
+		return sucList.get(maxI).move;
 	}
 
-	// TODO
+	// TODO WHAT IF A PLAYER WINS IN THE TREE
 	//
 	// Implement your helper methods here. They include at least the methods for selection,
 	// expansion, simulation, and back-propagation.
@@ -70,6 +81,11 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 	// you may feel free to modify).  If you decide not to use the child-sibling tree, simply
 	// remove these two classes.
 	//
+
+	double findUcb(MCNode node) {
+		return ((double) node.wins / node.playouts) +
+				c * Math.sqrt(Math.log(node.parent.playouts) / node.playouts);
+	}
 
 	int opponent(int player) {
 		if (player == CheckersData.RED)
@@ -84,11 +100,13 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 
 		ArrayList<MCNode> successors = node.successorNodes;
 
+		double maxUcb = -1;
 		int maxI = -1;
 		for (int i = 0; i < successors.size(); i++) {
-			// TODO
-			if (successors.get(i).ucb > successors.get(maxI).ucb) {
+			double curUcb = findUcb(successors.get(i));
+			if (curUcb > maxUcb) {
 				maxI = i;
+				maxUcb = curUcb;
 			}
 		}
 
@@ -139,7 +157,7 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 	}
 
 	void backPropagate(MCNode node, int winner) {
-		if (node.parent == null)
+		if (node == null)
 			return;
 
 		node.playouts++;
