@@ -12,7 +12,7 @@ import java.util.Random;
  * move at the current state.
  */
 public class MonteCarloTreeSearch extends AdversarialSearch {
-	final static int MAX_MOVE_COUNT = 200;
+	final static int MAX_MOVE_COUNT = 1000;
 	final static double c = Math.sqrt(2);
 	final static int DRAW = 0;
 
@@ -161,32 +161,8 @@ public class MonteCarloTreeSearch extends AdversarialSearch {
 			legalMoves = board.getLegalMoves(player);
 		}
 
-		// heuristic to determine winner (count up score)
-		if (moveCount == MAX_MOVE_COUNT) {
-			int redCount = 0, blackCount = 0;
-			for (int row = 0; row < 8; row++) {
-				for (int col = 0; col < 8; col++) {
-					if (board.board[row][col] == CheckersData.RED) {
-						redCount++;
-					} else if (board.board[row][col] == CheckersData.BLACK) {
-						blackCount++;
-					} else if (board.board[row][col] == CheckersData.RED_KING) {
-						redCount += 3;
-					} else if (board.board[row][col] ==
-							CheckersData.BLACK_KING) {
-						blackCount += 3;
-					}
-				}
-			}
-
-			if (redCount == blackCount) {
-				return DRAW;
-			} else if (redCount > blackCount) {
-				return CheckersData.RED;
-			} else {
-				return CheckersData.BLACK;
-			}
-		}
+		if (moveCount == MAX_MOVE_COUNT)
+			return DRAW;
 
 		// player is the looser, so opponent is winner
 		return opponent(player);
