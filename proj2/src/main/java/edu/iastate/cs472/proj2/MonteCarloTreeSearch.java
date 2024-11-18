@@ -12,7 +12,7 @@ import java.util.Random;
  * move at the current state.
  */
 public class MonteCarloTreeSearch extends AdversarialSearch {
-	final static int MAX_MOVE_COUNT = 1000;
+	final static int MAX_MOVE_COUNT = 200;
 	final static double c = Math.sqrt(2);
 	final static int DRAW = 0;
 
